@@ -42,6 +42,20 @@ function parse(tokens) {
       return null;
     }
   }
+  
+  // Define a function to match a variable token
+function matchVariable() {
+  // Check if the current token is a variable
+  if (tokens[i].type === "variable") {
+    // Return the variable and advance the token index
+    return tokens[i++].value;
+  }
+  // If the current token is not a variable, return null
+  else {
+    return null;
+  }
+}
+
 
   // Define a function to match a "for" loop
   function matchForLoop() {
@@ -90,4 +104,3 @@ function parse(tokens) {
           }
         }
       }
-    }
