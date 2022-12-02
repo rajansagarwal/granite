@@ -43,43 +43,51 @@ function parse(tokens) {
     }
   }
 
-  // Initialize the index of the current token
-  let i = 0;
+  // Define a function to match a "for" loop
+  function matchForLoop() {
+    // Check if the current token is the "for" keyword
+    if (tokens[i].type === "keyword" && tokens[i].value === "for") {
+      // Advance the token index
+      i++;
 
-  // Define the root node of the abstract syntax tree
-  const ast = {
-    type: "Program",
-    body: []
-  };
+      // Match the loop variable
+      const varName = matchVariable();
+      if (!varName) return null;
 
-  // Loop through the tokens, attempting to match expressions
-  while (i < tokens.length) {
-    // Try to match an expression
-    const expression = matchExpression();
-    if (expression) {
-      // If an expression was matched, add it to the body of the AST
-      ast.body.push({
-        type: "ExpressionStatement",
-        expression: {
-          type: "BinaryExpression",
-          operator: expression[1],
-          left: {
-            type: "Literal",
-            value: expression[0]
-          },
-          right: {
-            type: "Literal",
-            value: expression[2]
+      // Match the "in" keyword
+      const inToken = matchKeyword("in");
+      if (!inToken) return null;
+
+      // Match the start and end values
+      const startValue = matchNumber();
+      if (!startValue) return null;
+      const endValue = matchNumber();
+      if (!endValue) return null;
+
+      // Initialize an array to store the loop body
+      const body = [];
+
+      // Match the "{" character
+      const openBrace = matchPunctuation("{");
+      if (!openBrace) return null;
+
+      // Loop until the matching "}" is found
+      let depth = 0;
+      while (i < tokens.length) {
+        // If a "{" is encountered, increase the depth
+        if (tokens[i].value === "{") {
+          depth++;
+        }
+        // If a "}" is encountered, decrease the depth
+        else if (tokens[i].value === "}") {
+          depth--;
+
+          // If the depth is 0, we have found the matching "}"
+          if (depth === 0) {
+            // Advance the token index and break out of the loop
+            i++;
+            break;
           }
         }
-      });
+      }
     }
-    // If no expression was matched, throw an error
-    else {
-      throw new Error("Unexpected token: " + tokens[i]);
-    }
-  }
-
-  // Return the AST
-  return ast;
-}
